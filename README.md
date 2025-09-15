@@ -12,7 +12,8 @@ counseling-ai-app/
 │   │   ├── models.py
 │   │   ├── serializers.py
 │   │   ├── urls.py
-│   │   └── views.py
+│   │   ├── views.py
+│   │   └── api.py              <-- added
 │   ├── counseling_ai/
 │   │   ├── __init__.py
 │   │   ├── settings.py
@@ -25,6 +26,10 @@ counseling-ai-app/
 │
 └── frontend/
     ├── public/
+    │   ├── background.png      <-- added
+    │   ├── index.html          <-- added
+    │   ├── manifest.json       <-- added
+    │   └── questionnarire-bg.png <-- added
     ├── src/
     │   ├── components/
     │   │   ├── Questionnaire.js
@@ -32,9 +37,16 @@ counseling-ai-app/
     │   │   └── ChatInterface.js
     │   ├── services/
     │   │   └── api.js
+    │   ├── assets/             <-- added
+    │   │   ├── avatar.png      <-- added
+    │   │   └── my-logo.svg     <-- added
     │   ├── App.js
-    │   └── index.js
-    └── package.json
+    │   ├── index.js
+    │   └── index.css           <-- added
+    ├── package.json
+    ├── package-lock.json       <-- added
+    └── tailwind.config.js      <-- added
+
 
 Prerequisites
 Before you begin, ensure you have the following installed on your system:

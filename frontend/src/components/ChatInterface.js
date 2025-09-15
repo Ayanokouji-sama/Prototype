@@ -150,8 +150,8 @@ const ChatInterface = ({ sessionData }) => {
   // --- NEW JSX FOR THE VISUAL DESIGN ---
   
   return (
-    <div className="min-h-screen w-full bg-cover bg-center text-white font-glory brightness-125" style={{ backgroundImage: `url('/background.png')` }}>
-  <div className="min-h-screen w-full bg-black bg-opacity-15 backdrop-blur-light flex flex-col p-4 sm:p-6 md:p-8 lg:p-12">
+    <div className="h-screen w-screen bg-cover bg-center text-white font-glory brightness-125 overflow-hidden" style={{ backgroundImage: `url('/background.png')` }}>
+  <div className="h-full w-full bg-black bg-opacity-15 backdrop-blur-light flex flex-col p-4 sm:p-6 md:p-8 lg:p-12 overflow-hidden">
         
         {/* Header */}
 <header className="flex items-center justify-between flex-shrink-0 px-4 sm:px-6 md:px-8">
@@ -220,84 +220,97 @@ const ChatInterface = ({ sessionData }) => {
 </aside>
 
           {/* Chat Area */}
-<section className="font-roboto-flex flex-1 flex flex-col bg-white bg-opacity-5 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-3 sm:p-4 md:p-6 mr-0 md:mr-3 lg:mr-5 shadow-2xl shadow-black/40 order-1 md:order-2">
+<section className="font-roboto-flex flex-1 flex flex-col bg-white bg-opacity-5 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-3 sm:p-4 md:p-6 mr-0 md:mr-3 lg:mr-5 shadow-2xl shadow-black/40 order-1 md:order-2 min-h-0 max-h-full">
 
-  {/* Message list container */}
-  <div className="flex-1 overflow-y-auto space-y-3 sm:space-y-4 md:space-y-6 pr-1 sm:pr-2 custom-scrollbar">
-    {isLoading ? (
-      <div className="flex justify-center items-center h-full">
-        <div className="animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 border-b-2 border-white"></div>
-      </div>
-    ) : (
-      messages.map((msg) => <MessageBubble key={msg.message_id} message={msg} />)
-    )}
-    {isTyping && <TypingIndicator />}
-    <div ref={messagesEndRef} />
-  </div>
-
-  <div className="mt-3 sm:mt-4 md:mt-6 flex items-center gap-2 sm:gap-3 md:gap-4">
-    
-    {/* Item 1: The Input Bar */}
-    <div className="input-glow-line flex-1 flex items-center gap-2 sm:gap-3 bg-white text-black text-base sm:text-lg backdrop-blur-lg rounded-full p-1 sm:p-2">
-      <input 
-        ref={inputRef}
-        type="text"
-        value={inputMessage}
-        onChange={(e) => setInputMessage(e.target.value)}
-        onKeyPress={handleKeyPress}
-        placeholder="Type Your Career Question..."
-        className="flex-1 bg-transparent px-3 sm:px-4 py-2 text-black placeholder-gray-600 focus:outline-none text-sm sm:text-base md:text-lg"
-        disabled={isTyping || isLoading}
-      />
-      <button
-        onClick={handleSendMessage}
-        disabled={!inputMessage.trim() || isTyping || isLoading}
-        className="p-2 sm:p-3 bg-white text-black rounded-full hover:bg-gray-200 disabled:opacity-50 transition"
-      >
-        <Send size={16} className="sm:hidden" />
-        <Send size={20} className="hidden sm:block" />
-      </button>
+  {/* Message list container - CRITICAL FIXES */}
+<div className="flex-1 overflow-y-auto space-y-3 sm:space-y-4 md:space-y-6 pr-1 sm:pr-2 custom-scrollbar min-h-0">
+  {isLoading ? (
+    <div className="flex justify-center items-center h-full min-h-[200px]">
+      <div className="animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 border-b-2 border-white"></div>
     </div>
-    
-    {/* --- START: NEW ATTACHMENT BUTTON AND HIDDEN INPUT --- */}
-    <input
-      type="file"
-      ref={fileInputRef}
-      onChange={handleFileChange}
-      className="hidden"
-      accept=".pdf,.doc,.docx,.txt" // Specify acceptable file types
-    />
-    <button 
-      onClick={handleFileSelect} 
-      className="p-2 sm:p-3 md:p-4 bg-black bg-opacity-100 rounded-full hover:bg-opacity-80 transition text-white">
-      <Paperclip size={18} className="sm:hidden" />
-      <Paperclip size={20} className="hidden sm:block md:hidden" />
-      <Paperclip size={24} className="hidden md:block" />
-    </button>
+  ) : (
+    messages.map((msg) => <MessageBubble key={msg.message_id} message={msg} />)
+  )}
+  {isTyping && <TypingIndicator />}
+  <div ref={messagesEndRef} />
+</div>
 
-    {/* Item 2: The Standalone Mic Button */}
-    <button className="p-2 sm:p-3 md:p-4 bg-black bg-opacity-100 rounded-full hover:bg-opacity-80 transition text-white">
-      <Mic size={18} className="sm:hidden" />
-      <Mic size={20} className="hidden sm:block md:hidden" />
-      <Mic size={24} className="hidden md:block" />
+{/* Input area - FIXED AT BOTTOM */}
+<div className="mt-3 sm:mt-4 md:mt-6 flex items-center gap-2 sm:gap-3 md:gap-4 flex-shrink-0">
+  
+  {/* Item 1: The Input Bar */}
+  <div className="input-glow-line flex-1 flex items-center gap-2 sm:gap-3 bg-white text-black text-base sm:text-lg backdrop-blur-lg rounded-full p-1 sm:p-2">
+    <input 
+      ref={inputRef}
+      type="text"
+      value={inputMessage}
+      onChange={(e) => setInputMessage(e.target.value)}
+      onKeyPress={handleKeyPress}
+      placeholder="Type Your Career Question..."
+      className="flex-1 bg-transparent px-3 sm:px-4 py-2 text-black placeholder-gray-600 focus:outline-none text-sm sm:text-base md:text-lg min-w-0"
+      disabled={isTyping || isLoading}
+    />
+    <button
+      onClick={handleSendMessage}
+      disabled={!inputMessage.trim() || isTyping || isLoading}
+      className="p-2 sm:p-3 bg-white text-black rounded-full hover:bg-gray-200 disabled:opacity-50 transition flex-shrink-0"
+    >
+      <Send size={16} className="sm:hidden" />
+      <Send size={20} className="hidden sm:block" />
     </button>
-    
   </div>
+  
+  {/* --- START: NEW ATTACHMENT BUTTON AND HIDDEN INPUT --- */}
+  <input
+    type="file"
+    ref={fileInputRef}
+    onChange={handleFileChange}
+    className="hidden"
+    accept=".pdf,.doc,.docx,.txt"
+  />
+  <button 
+    onClick={handleFileSelect} 
+    className="p-2 sm:p-3 md:p-4 bg-black bg-opacity-100 rounded-full hover:bg-opacity-80 transition text-white flex-shrink-0">
+    <Paperclip size={18} className="sm:hidden" />
+    <Paperclip size={20} className="hidden sm:block md:hidden" />
+    <Paperclip size={24} className="hidden md:block" />
+  </button>
+
+  {/* Item 2: The Standalone Mic Button */}
+  <button className="p-2 sm:p-3 md:p-4 bg-black bg-opacity-100 rounded-full hover:bg-opacity-80 transition text-white flex-shrink-0">
+    <Mic size={18} className="sm:hidden" />
+    <Mic size={20} className="hidden sm:block md:hidden" />
+    <Mic size={24} className="hidden md:block" />
+  </button>
+  
+</div>
 </section>
 
         </main>
       </div>
       <style>{`
+        .custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
         .custom-scrollbar::-webkit-scrollbar {
-          width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
-        }
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: rgba(255, 255, 255, 0.2);
-          border-radius: 3px;
-        }
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+}
+ 
+.message-content {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: none; 
+  white-space: pre-wrap;
+}
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
           background: rgba(255, 255, 255, 0.3);
         }
@@ -323,14 +336,35 @@ const ChatInterface = ({ sessionData }) => {
 // UPDATED MessageBubble component to better match Figma
 const MessageBubble = ({ message }) => {
   const isUser = message.sender === 'user';
-  // Specific green color from Figma design, and off-white for AI
-  const userBubbleClass = 'bg-[#64855f]/75 bg-opacity-70 text-white rounded-br-lg text-lg';
-  const aiBubbleClass = 'text-black rounded-bl-lg text-lg';
+  
+  // Fixed classes - removed conflicts
+  const userBubbleClass = 'bg-[#64855f]/75 text-white';
+  const aiBubbleClass = 'bg-white/10 text-black';
 
   return (
     <div className={`flex w-full ${isUser ? 'justify-end' : 'justify-start'}`}>
-      <div className={`max-w-xl p-4 rounded-3xl backdrop-blur-xl shadow-lg relative ${isUser ? userBubbleClass : aiBubbleClass}`}>
-        <p className="whitespace-pre-wrap leading-relaxed">{message.message}</p>
+      <div className={`
+        max-w-[90%] 
+        xs:max-w-[85%] 
+        sm:max-w-[75%] 
+        md:max-w-[65%] 
+        lg:max-w-[55%] 
+        xl:max-w-[50%] 
+        2xl:max-w-[45%]
+        p-3 
+        sm:p-4 
+        rounded-2xl 
+        sm:rounded-3xl 
+        backdrop-blur-xl 
+        shadow-lg 
+        ${isUser ? userBubbleClass : aiBubbleClass}
+      `}>
+        {/* FIXED: Remove text-black for user messages */}
+        <p className={`whitespace-pre-wrap leading-relaxed opacity-90 hyphens-none break-words text-sm sm:text-base ${
+          isUser ? 'text-white' : 'text-black'
+        }`}>
+          {message.message}
+        </p>
       </div>
     </div>
   );

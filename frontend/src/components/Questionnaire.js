@@ -76,9 +76,9 @@ const Questionnaire = ({ onComplete }) => {
 
 return (
     <div 
-  className="min-h-screen w-full bg-cover bg-center bg-no-repeat flex flex-col items-center justify-center p-3 sm:p-4 md:p-6 lg:p-8 text-white relative"
+  className="h-screen w-screen bg-cover bg-center bg-no-repeat flex flex-col items-center justify-center p-3 sm:p-4 md:p-6 lg:p-8 text-white relative overflow-hidden"
   style={{ backgroundImage: 'url(/questionnarie-bg.png)' }}
-    >
+>
         {/* Header with Logo */}
 <div className="absolute top-4 sm:top-6 md:top-8 left-4 sm:left-6 md:left-8 flex items-center gap-2 sm:gap-3 md:gap-4 lg:gap-5">
     <MyLogo className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 text-white" />
