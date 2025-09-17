@@ -102,7 +102,7 @@ def chat_with_ai(context: dict, message: str, history: str):
     })
     return result['text']
 # --- UPDATED: Career-roadmap AI Function ---
-# In backend/api/llm_engine.py
+
 
 def generate_career_roadmap(session, history_text):
     """
@@ -125,12 +125,10 @@ def generate_career_roadmap(session, history_text):
         You MUST format your response as a single, valid JSON object.
         The JSON object must have a single key named "roadmap" which is a list of 3 suggestion objects.
         Each suggestion object must have these exact keys: "title", "skills", "reasoning".
-        - "title": string (The academic field)
-        - "skills": list of 3-5 strings (The key skills required)
-        - "reasoning": string (A brief, 50-word explanation)
         
         Do not include any other text, explanations, or introductory phrases in your response.
-        Your response must start with `{` and end with `}`.
+        # --- FIX: Escaped the curly braces below ---
+        Your response must start with {{{{ and end with }}}}.
         """
         prompt = PromptTemplate(input_variables=["chat_history"], template=template)
         chain = LLMChain(llm=llm, prompt=prompt)
@@ -146,22 +144,16 @@ def generate_career_roadmap(session, history_text):
         You MUST format your response as a single, valid JSON object.
         The JSON object must have a single key named "roadmap" which is a list of 3 pathway objects.
         Each pathway object must have these exact keys: "title", "skills", "courses", "salary", "growth", "reasoning".
-        - "title": string (The Occupation Title)
-        - "skills": list of 5-7 strings (The key skills required)
-        - "courses": list of 2-3 strings (Real, full Coursera URLs)
-        - "salary": string (The expected salary range)
-        - "growth": string ("High", "Medium", or "Low")
-        - "reasoning": string (A brief, 50-word explanation)
 
         Do not include any other text, explanations, or introductory phrases in your response.
-        Your response must start with `{` and end with `}`.
+        # --- FIX: Escaped the curly braces below ---
+        Your response must start with {{{{ and end with }}}}.
         """
         prompt = PromptTemplate(input_variables=["chat_history", "resume_context"], template=template)
         chain = LLMChain(llm=llm, prompt=prompt)
         result = chain.invoke({"chat_history": history_text, "resume_context": resume_context})
 
     try:
-        # Added a print statement here for easy debugging in your terminal
         print("--- LLM Roadmap Response ---")
         print(result['text'])
         print("--------------------------")
