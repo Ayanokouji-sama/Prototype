@@ -4,7 +4,7 @@ import { Menu, User, Send, Mic, Paperclip } from 'lucide-react';
 import counselorAvatar from '../assets/avatar.png';
 
 // This component uses YOUR original logic with the NEW design.
-const ChatInterface = ({ sessionData }) => {
+const ChatInterface = ({ sessionData, onNavigateToRoadmap }) => {
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -229,7 +229,7 @@ const ChatInterface = ({ sessionData }) => {
       <div className="animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 border-b-2 border-white"></div>
     </div>
   ) : (
-    messages.map((msg) => <MessageBubble key={msg.message_id} message={msg} />)
+    messages.map((msg) => <MessageBubble key={msg.message_id} message={msg} onNavigate={onNavigateToRoadmap} />)
   )}
   {isTyping && <TypingIndicator />}
   <div ref={messagesEndRef} />
@@ -334,12 +334,16 @@ const ChatInterface = ({ sessionData }) => {
 };
 
 // UPDATED MessageBubble component to better match Figma
-const MessageBubble = ({ message }) => {
+const MessageBubble = ({ message, onNavigate }) => {
   const isUser = message.sender === 'user';
   
   // Fixed classes - removed conflicts
   const userBubbleClass = 'bg-[#64855f]/75 text-white';
   const aiBubbleClass = 'bg-white/10 text-black';
+
+  // --- Link Detection Logic ---
+  const roadmapLinkText = '[View Your Roadmap]';
+  const containsRoadmapLink = message.message.includes(roadmapLinkText);
 
   return (
     <div className={`flex w-full ${isUser ? 'justify-end' : 'justify-start'}`}>
@@ -359,12 +363,25 @@ const MessageBubble = ({ message }) => {
         shadow-lg 
         ${isUser ? userBubbleClass : aiBubbleClass}
       `}>
-        {/* FIXED: Remove text-black for user messages */}
-        <p className={`whitespace-pre-wrap leading-relaxed opacity-90 hyphens-none break-words text-sm sm:text-base ${
-          isUser ? 'text-white' : 'text-black'
-        }`}>
-          {message.message}
-        </p>
+        {containsRoadmapLink ? (
+          // If it's the special link, render a button
+          <div>
+            <p className={`whitespace-pre-wrap leading-relaxed opacity-90 break-words text-sm sm:text-base mb-3 ${isUser ? 'text-white' : 'text-black'}`}>
+              {message.message.split(roadmapLinkText)[0]} {/* Show text before the link */}
+            </p>
+            <button
+              onClick={onNavigate}
+              className="w-full text-center font-bold text-white bg-green-500 rounded-lg px-4 py-2 hover:bg-green-600 transition-all duration-200"
+            >
+              View Your Roadmap
+            </button>
+          </div>
+        ) : (
+          // Otherwise, render the normal message text
+          <p className={`whitespace-pre-wrap leading-relaxed opacity-90 hyphens-none break-words text-sm sm:text-base ${isUser ? 'text-white' : 'text-black'}`}>
+            {message.message}
+          </p>
+        )}
       </div>
     </div>
   );

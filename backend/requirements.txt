@@ -3,4 +3,5 @@ djangorestframework
 django-cors-headers
 langchain
 langchain-ollama
+langchain_community
 

@@ -1,4 +1,5 @@
 # backend/api/llm_engine.py
+import json
 
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
@@ -74,7 +75,7 @@ prompt = PromptTemplate(
 
 chain = LLMChain(llm=llm, prompt=prompt)
 
-# --- UPDATED: Main AI Function ---
+# --- Main AI Function ---
 def chat_with_ai(context: dict, message: str, history: str):
     """
     Generates an AI response, now with the ability to process a resume.
@@ -99,5 +100,67 @@ def chat_with_ai(context: dict, message: str, history: str):
         "history": history,
         "message": message,
     })
-    
     return result['text']
+# --- UPDATED: Career-roadmap AI Function ---
+def generate_career_roadmap(session, history_text):
+    """
+    Generates a career roadmap based on the user's status and chat history.
+    """
+    resume_context = "No resume provided for this session."
+    
+    # This logic correctly prepares the context for the LLM
+    if session.resume_file and hasattr(session.resume_file, 'path'):
+        vector_store = process_resume(session.resume_file.path)
+        if vector_store:
+            relevant_chunks = vector_store.similarity_search(history_text, k=3)
+            resume_context = " ".join([chunk.page_content for chunk in relevant_chunks])
+
+    # --- Conditional Prompting ---
+    if session.status == 'school_student':
+        # Prompt for school students (no courses, no salary)
+        template = """
+        Based on the conversation with this school student, suggest 3-5 potential academic fields or streams they could pursue in higher education.
+        For each suggestion, provide:
+        - "title": (the field or stream)
+        - "skills": (a list of 3-5 key skills)
+        - "reasoning": (a brief explanation, in 50 words)
+
+        Format the entire output as a single, clean JSON object with a single key "roadmap" containing a list of these suggestions.
+        Chat History: {chat_history}
+        """
+        prompt = PromptTemplate(input_variables=["chat_history"], template=template)
+        chain = LLMChain(llm=llm, prompt=prompt)
+        
+        # FIX: Use .invoke() which is the modern, correct way to run the chain
+        result = chain.invoke({"chat_history": history_text})
+
+    else: # For college students and professionals
+        # Prompt for college/professionals (includes courses, salary, etc.)
+        template = """
+        Based on the conversation and resume context, provide 3-5 detailed career pathways.
+        For each pathway, provide:
+        - "title": (The Occupation Title)
+        - "skills": (a list of 5-7 key skills)
+        - "courses": (a list of 2-3 real, relevant Coursera course URLs)
+        - "salary": (A string representing the Expected Salary Range)
+        - "growth": (A string: "High", "Medium", or "Low")
+        - "reasoning": (A brief explanation, in 50 words)
+
+        Format the entire output as a single, clean JSON object with a single key "roadmap" containing a list of these pathways.
+        Chat History: {chat_history}
+        Resume Context: {resume_context}
+        """
+        prompt = PromptTemplate(input_variables=["chat_history", "resume_context"], template=template)
+        chain = LLMChain(llm=llm, prompt=prompt)
+
+        # FIX: Use .invoke() here as well
+        result = chain.invoke({"chat_history": history_text, "resume_context": resume_context})
+
+    try:
+        # The actual text response is in the 'text' key of the result dictionary
+        return json.loads(result['text'])
+    except (json.JSONDecodeError, TypeError, KeyError):
+        # Fallback in case of an error
+        return {"error": "Could not generate roadmap data."}
+    
+    

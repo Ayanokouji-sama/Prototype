@@ -3,7 +3,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import UserSession, ChatMessage
 from .serializers import UserSessionSerializer, ChatMessageSerializer, ChatSendSerializer, ChatHistorySerializer
-from .llm_engine import chat_with_ai
+from .llm_engine import chat_with_ai, generate_career_roadmap
+
 
 @api_view(['POST'])
 def submit_questionnaire(request):
@@ -39,19 +40,45 @@ def send_message(request):
         
         # Save the user's message
         ChatMessage.objects.create(session=session, sender='user', message=message_text)
+
+
+         # 1. Check if the user is explicitly asking for the roadmap
+        user_wants_roadmap = 'roadmap' in message_text.lower() or 'career plan' in message_text.lower()
+
+         # --- ROADMAP TRIGGER LOGIC ---
+         # First, get the total message count for this session
+        message_count = ChatMessage.objects.filter(session=session).count()
+        limit_reached = message_count >= 10
+        # Check if the message limit is reached AND the roadmap hasn't been created yet
+        if (limit_reached or user_wants_roadmap) and not session.roadmap_data:
+            
+            # This part of the logic is unchanged. It generates and saves the roadmap.
+            history_queryset = ChatMessage.objects.filter(session=session).order_by("timestamp")
+            history_text = "\n".join([f"{msg.get_sender_display()}: {msg.message}" for msg in history_queryset])
+            
+            roadmap_json = generate_career_roadmap(session, history_text)
+            session.roadmap_data = roadmap_json
+            session.save()
+            
+            final_ai_message_text = f"We've had a great conversation! I've prepared a personalized career roadmap for you based on everything we've discussed. You can access it here: [View Your Roadmap](/roadmap/{session.session_id})"
+            
+            ai_message = ChatMessage.objects.create(session=session, sender='ai', message=final_ai_message_text)
+        else:
+            # --- NORMAL CONVERSATION FLOW ---
+            # If the limit isn't reached, continue the conversation as usual.
         
-        # Get the full conversation history to provide context to the LLM
-        history_queryset = ChatMessage.objects.filter(session=session).order_by("timestamp")
-        history_text = "\n".join([f"{msg.get_sender_display()}: {msg.message}" for msg in history_queryset])
+            # Get the full conversation history to provide context to the LLM
+            history_queryset = ChatMessage.objects.filter(session=session).order_by("timestamp")
+            history_text = "\n".join([f"{msg.get_sender_display()}: {msg.message}" for msg in history_queryset])
         
-        # Prepare the context from the user's session data
-        context = { "name": session.name, "status": session.status, "age": session.age }
+            # Prepare the context from the user's session data
+            context = { "name": session.name, "status": session.status, "age": session.age }
         
-        # Call the LLM to get the next response
-        ai_response_text = chat_with_ai(context, message_text, history_text)
+            # Call the LLM to get the next response
+            ai_response_text = chat_with_ai(context, message_text, history_text)
         
-        # Save the AI's response
-        ai_message = ChatMessage.objects.create(session=session, sender='ai', message=ai_response_text)
+            # Save the AI's response
+            ai_message = ChatMessage.objects.create(session=session, sender='ai', message=ai_response_text)
         
         return Response({
             'success': True,
@@ -70,6 +97,21 @@ def get_chat_history(request, session_id):
     
     except UserSession.DoesNotExist:
         return Response({'success': False, 'error': 'Session not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+@api_view(['GET'])
+def get_roadmap(request, session_id):
+    """
+    Get the generated career roadmap for a session
+    """
+    try:
+        session = UserSession.objects.get(session_id=session_id)
+        if session.roadmap_data:
+            return Response(session.roadmap_data, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'Roadmap not generated yet.'}, status=status.HTTP_404_NOT_FOUND)
+    
+    except UserSession.DoesNotExist:
+        return Response({'error': 'Session not found'}, status=status.HTTP_404_NOT_FOUND)
 
 @api_view(['POST'])
 def upload_resume(request):

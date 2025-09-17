@@ -2,11 +2,19 @@ import React, { useState } from 'react';
 import Questionnaire from './components/Questionnaire';
 import LoadingScreen from './components/LoadingScreen';
 import ChatInterface from './components/ChatInterface';
+import CareerRoadmap from './components/CareerRoadmap';
 import './index.css';
 
 function App() {
-  const [currentStage, setCurrentStage] = useState('questionnaire');
-  const [sessionData, setSessionData] = useState(null);
+  const [currentStage, setCurrentStage] = useState(() => localStorage.getItem('currentStage') || 'questionnaire');
+  const [sessionData, setSessionData] = useState(() => JSON.parse(localStorage.getItem('sessionData')) || null);
+
+  useEffect(() => {
+    localStorage.setItem('currentStage', currentStage);
+    localStorage.setItem('sessionData', JSON.stringify(sessionData));
+  }, [currentStage, sessionData]);
+
+
 
   const handleQuestionnaireComplete = (data) => {
     console.log('Questionnaire successful. Session data:', data);
@@ -19,6 +27,18 @@ function App() {
     setCurrentStage('chat');
   };
 
+  const handleNavigateToRoadmap = () => {
+    console.log('Navigating to career roadmap.');
+    setCurrentStage('roadmap');
+  };
+
+  const handleStartNewSession = () => {
+    localStorage.removeItem('currentStage');
+    localStorage.removeItem('sessionData');
+    setCurrentStage('questionnaire');
+    setSessionData(null);
+  };
+
   const renderCurrentStage = () => {
     switch (currentStage) {
       case 'questionnaire':
@@ -26,7 +46,9 @@ function App() {
       case 'loading':
         return <LoadingScreen onComplete={handleLoadingComplete} />;
       case 'chat':
-        return <ChatInterface sessionData={sessionData} />;
+        return <ChatInterface sessionData={sessionData} onNavigateToRoadmap={handleNavigateToRoadmap} />;
+      case 'roadmap':
+        return <CareerRoadmap sessionData={sessionData} onStartNewSession={handleStartNewSession} />;
       default:
         return <Questionnaire onComplete={handleQuestionnaireComplete} />;
     }

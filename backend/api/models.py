@@ -21,6 +21,7 @@ class UserSession(models.Model):
     resume_file = models.FileField(upload_to='resumes/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    roadmap_data = models.JSONField(null=True, blank=True)
 
     class Meta:
         db_table = 'user_sessions'
