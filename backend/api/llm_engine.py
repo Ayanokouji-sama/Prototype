@@ -102,13 +102,13 @@ def chat_with_ai(context: dict, message: str, history: str):
     })
     return result['text']
 # --- UPDATED: Career-roadmap AI Function ---
+# In backend/api/llm_engine.py
+
 def generate_career_roadmap(session, history_text):
     """
-    Generates a career roadmap based on the user's status and chat history.
+    Generates a career roadmap with a more robust and specific prompt.
     """
     resume_context = "No resume provided for this session."
-    
-    # This logic correctly prepares the context for the LLM
     if session.resume_file and hasattr(session.resume_file, 'path'):
         vector_store = process_resume(session.resume_file.path)
         if vector_store:
@@ -117,50 +117,56 @@ def generate_career_roadmap(session, history_text):
 
     # --- Conditional Prompting ---
     if session.status == 'school_student':
-        # Prompt for school students (no courses, no salary)
         template = """
-        Based on the conversation with this school student, suggest 3-5 potential academic fields or streams they could pursue in higher education.
-        For each suggestion, provide:
-        - "title": (the field or stream)
-        - "skills": (a list of 3-5 key skills)
-        - "reasoning": (a brief explanation, in 50 words)
-
-        Format the entire output as a single, clean JSON object with a single key "roadmap" containing a list of these suggestions.
+        Analyze the following conversation with a school student.
         Chat History: {chat_history}
+
+        Based ONLY on the chat history, your task is to suggest 3 potential academic fields.
+        You MUST format your response as a single, valid JSON object.
+        The JSON object must have a single key named "roadmap" which is a list of 3 suggestion objects.
+        Each suggestion object must have these exact keys: "title", "skills", "reasoning".
+        - "title": string (The academic field)
+        - "skills": list of 3-5 strings (The key skills required)
+        - "reasoning": string (A brief, 50-word explanation)
+        
+        Do not include any other text, explanations, or introductory phrases in your response.
+        Your response must start with `{` and end with `}`.
         """
         prompt = PromptTemplate(input_variables=["chat_history"], template=template)
         chain = LLMChain(llm=llm, prompt=prompt)
-        
-        # FIX: Use .invoke() which is the modern, correct way to run the chain
         result = chain.invoke({"chat_history": history_text})
 
     else: # For college students and professionals
-        # Prompt for college/professionals (includes courses, salary, etc.)
         template = """
-        Based on the conversation and resume context, provide 3-5 detailed career pathways.
-        For each pathway, provide:
-        - "title": (The Occupation Title)
-        - "skills": (a list of 5-7 key skills)
-        - "courses": (a list of 2-3 real, relevant Coursera course URLs)
-        - "salary": (A string representing the Expected Salary Range)
-        - "growth": (A string: "High", "Medium", or "Low")
-        - "reasoning": (A brief explanation, in 50 words)
-
-        Format the entire output as a single, clean JSON object with a single key "roadmap" containing a list of these pathways.
+        Analyze the following conversation and resume context.
         Chat History: {chat_history}
         Resume Context: {resume_context}
+
+        Based on this information, your task is to suggest 3 detailed career pathways.
+        You MUST format your response as a single, valid JSON object.
+        The JSON object must have a single key named "roadmap" which is a list of 3 pathway objects.
+        Each pathway object must have these exact keys: "title", "skills", "courses", "salary", "growth", "reasoning".
+        - "title": string (The Occupation Title)
+        - "skills": list of 5-7 strings (The key skills required)
+        - "courses": list of 2-3 strings (Real, full Coursera URLs)
+        - "salary": string (The expected salary range)
+        - "growth": string ("High", "Medium", or "Low")
+        - "reasoning": string (A brief, 50-word explanation)
+
+        Do not include any other text, explanations, or introductory phrases in your response.
+        Your response must start with `{` and end with `}`.
         """
         prompt = PromptTemplate(input_variables=["chat_history", "resume_context"], template=template)
         chain = LLMChain(llm=llm, prompt=prompt)
-
-        # FIX: Use .invoke() here as well
         result = chain.invoke({"chat_history": history_text, "resume_context": resume_context})
 
     try:
-        # The actual text response is in the 'text' key of the result dictionary
+        # Added a print statement here for easy debugging in your terminal
+        print("--- LLM Roadmap Response ---")
+        print(result['text'])
+        print("--------------------------")
         return json.loads(result['text'])
     except (json.JSONDecodeError, TypeError, KeyError):
-        # Fallback in case of an error
-        return {"error": "Could not generate roadmap data."}
+        return {"error": "Failed to decode the roadmap from AI response."}
     
     
