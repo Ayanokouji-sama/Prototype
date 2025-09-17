@@ -48,7 +48,7 @@ def send_message(request):
          # --- ROADMAP TRIGGER LOGIC ---
          # First, get the total message count for this session
         message_count = ChatMessage.objects.filter(session=session).count()
-        limit_reached = message_count >= 30
+        limit_reached = message_count >= 12
         # Check if the message limit is reached AND the roadmap hasn't been created yet
         if (limit_reached or user_wants_roadmap) and not session.roadmap_data:
             

@@ -118,17 +118,16 @@ def generate_career_roadmap(session, history_text):
     # --- Conditional Prompting ---
     if session.status == 'school_student':
         template = """
-        Analyze the following conversation with a school student.
-        Chat History: {chat_history}
-
-        Based ONLY on the chat history, your task is to suggest 3 potential academic fields.
-        You MUST format your response as a single, valid JSON object.
-        The JSON object must have a single key named "roadmap" which is a list of 3 suggestion objects.
-        Each suggestion object must have these exact keys: "title", "skills", "reasoning".
-        
-        Do not include any other text, explanations, or introductory phrases in your response.
-        # --- FIX: Escaped the curly braces below ---
-        Your response must start with {{{{ and end with }}}}.
+        You are a JSON generation assistant. Analyze the following conversation and generate a JSON object.
+        Conversation:
+        ---
+        {chat_history}
+        ---
+        TASK: Based on the conversation, suggest 3 academic fields for the student.
+        You MUST respond with ONLY a single, valid JSON object.
+        The JSON object must have a key "roadmap" which contains a list of 3 objects.
+        Each object MUST have these exact keys: "title" (string), "skills" (list of strings), "reasoning" (string).
+        DO NOT add any text before or after the JSON object.
         """
         prompt = PromptTemplate(input_variables=["chat_history"], template=template)
         chain = LLMChain(llm=llm, prompt=prompt)
@@ -142,12 +141,13 @@ def generate_career_roadmap(session, history_text):
 
         Based on this information, your task is to suggest 3 detailed career pathways.
         You MUST format your response as a single, valid JSON object.
-        The JSON object must have a single key named "roadmap" which is a list of 3 pathway objects.
+        The object must have one key "roadmap", a list of 3 pathway objects.
         Each pathway object must have these exact keys: "title", "skills", "courses", "salary", "growth", "reasoning".
+        - The "courses" value MUST be a list of 2-3 strings.
+        - Each string in the "courses" list MUST be a full, valid Coursera URL starting with "https://www.coursera.org/".
+        Example for a course: "https://www.coursera.org/learn/python-for-everybody"
 
-        Do not include any other text, explanations, or introductory phrases in your response.
-        # --- FIX: Escaped the curly braces below ---
-        Your response must start with {{{{ and end with }}}}.
+        Do not add any other text or explanations. Your response must be only the JSON object.
         """
         prompt = PromptTemplate(input_variables=["chat_history", "resume_context"], template=template)
         chain = LLMChain(llm=llm, prompt=prompt)
