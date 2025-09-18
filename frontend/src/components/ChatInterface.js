@@ -168,7 +168,7 @@ const ChatInterface = ({ sessionData, onNavigateToRoadmap }) => {
             </span>
           </div>
         </div>
-        <MyLogo className="w-5 h-5 sm:w-7 sm:h-7 md:w-9 md:w-9 text-white opacity-70" />
+        <MyLogo className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 text-white" />
         <button className="p-1.5 sm:p-2 md:p-3 bg-black bg-opacity-100 rounded-full hover:bg-opacity-70 transition">
           <User size={16} className="sm:hidden" />
           <User size={21} className="hidden sm:block md:hidden" />

@@ -15,20 +15,20 @@ async function fetchRoadmapData(sessionId) {
 const CareerCard = ({ option }) => {
     return (
         // --- CHANGES: Reduced padding (p-4) and margin-bottom (mb-4) ---
-        <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl shadow-lg p-4 mb-4">
+        <div className="bg-white bg-opacity-5 backdrop-blur-lg border border-white/40 rounded-2xl shadow-lg p-4 mb-4">
             {/* --- CHANGE: Smaller title font size (text-xl) --- */}
-            <h3 className="text-xl font-bold text-white opacity-90 mb-2">{option.title || option['Occupation Title']}</h3>
+            <h3 className="text-xl font-bold font-roboto-flex text-white opacity-90 mb-2">{option.title || option['Occupation Title']}</h3>
             
             {/* --- CHANGE: Smaller body font size (text-sm) --- */}
-            <p className="text-white opacity-80 text-sm mb-3">{option.reasoning}</p>
+            <p className="text-white font-light font-roboto-flex opacity-80 text-sm mb-3">{option.reasoning}</p>
 
             <div className="mb-3">
                 {/* --- CHANGE: Smaller subheading font size (text-base) --- */}
-                <h4 className="font-semibold text-white opacity-80 text-base mb-2">Key Skills Required:</h4>
+                <h4 className="font-normal font-roboto-flex text-white opacity-80 text-base mb-2">Key Skills Required:</h4>
                 <div className="flex flex-wrap gap-2">
                     {option.skills && option.skills.map((skill, index) => (
                         // --- CHANGE: Smaller skill "pills" ---
-                        <span key={index} className="bg-blue-100 text-black opacity-80 text-xs font-medium px-2.5 py-1 rounded-full">
+                        <span key={index} className="bg-white/80 text-black opacity-80 text-xs font-medium px-2.5 py-1 rounded-full">
                             {skill}
                         </span>
                     ))}
@@ -37,29 +37,29 @@ const CareerCard = ({ option }) => {
 
             {option.salary && (
                  <div className="mb-3">
-                    <h4 className="font-semibold text-gray-800 text-sm">Expected Salary Range:</h4>
-                    <p className="text-gray-600 text-sm">{option.salary}</p>
+                    <h4 className="font-normal font-roboto-flex text-white/90 text-sm">Expected Salary Range:</h4>
+                    <p className="text-white/70 text-sm">{option.salary}</p>
                 </div>
             )}
 
             {option.growth && (
                  <div className="mb-3">
-                    <h4 className="font-semibold text-gray-800 text-sm">5-Year Growth Potential:</h4>
-                    <p className="text-gray-600 text-sm">{option.growth}</p>
+                    <h4 className="font-normal font-roboto-flex text-white/90 text-sm">5-Year Growth Potential:</h4>
+                    <p className="text-white/70 text-sm">{option.growth}</p>
                 </div>
             )}
 
             {option.courses && option.courses.length > 0 && (
                 <div>
-                    <h4 className="font-semibold text-gray-800 text-sm mb-2">Recommended Courses:</h4>
-                    <ul className="list-disc list-inside space-y-1">
+                    <h4 className="font-normal font-roboto-flex text-white/90 text-sm mb-2">Recommended Courses:</h4>
+                    <ul className="list-disc list-inside space-y-1 text-white/80">
                         {option.courses.map((course, index) => (
                             <li key={index} className="text-sm">
                                 <a 
                                    href={course.url} 
                                    target="_blank" 
                                    rel="noopener noreferrer" 
-                                   className="text-indigo-600 hover:underline"
+                                   className="!text-cyan-400 hover:!text-cyan-300 hover:underline no-underline transition-colors"
                                 >
                                     {course.name}
                                 </a>
@@ -98,7 +98,7 @@ const CareerRoadmap = ({ sessionData, onStartNewSession }) => {
     }, [sessionId]);
 
     if (loading) {
-        return <div className="text-center p-10">Loading your personalized roadmap...</div>;
+        return <div className="text-center p-10 font-glory">Loading your personalized roadmap...</div>;
     }
 
     if (error) {
@@ -116,11 +116,11 @@ const CareerRoadmap = ({ sessionData, onStartNewSession }) => {
                 <Menu size={24} className="text-white hidden sm:block md:hidden" />
                 <Menu size={32} className="text-white hidden md:block" />
             </button>
-            <div className="px-3 sm:px-6 md:px-9 lg:px-12 xl:px-18 py-1.5 sm:py-2 md:py-2 bg-white bg-opacity-90 shadow-sm rounded-full -ml-6 sm:-ml-9 md:-ml-12">
-                <span className="font-light text-xs sm:text-base md:text-lg lg:text-xl xl:text-2xl text-black ml-1.5 sm:ml-2 md:ml-3 whitespace-nowrap">
-                    RoadMap
-                </span>
-            </div>
+            <div className="px-3 sm:px-6 md:px-9 lg:px-12 xl:px-18 py-1.5 sm:py-2 md:py-3 bg-white bg-opacity-10 rounded-full -ml-6 sm:-ml-9 md:-ml-12">
+            <span className="font-light text-xs sm:text-base md:text-lg lg:text-xl xl:text-2xl text-white ml-1.5 sm:ml-2 md:ml-3 whitespace-nowrap">
+              RoadMap
+            </span>
+          </div>
         </div>
     </div>
 
@@ -132,9 +132,9 @@ const CareerRoadmap = ({ sessionData, onStartNewSession }) => {
     {/* Right container (takes up 1/3, content pushed to the right) */}
     <div className="w-1/3 flex justify-end">
         <button className="p-1.5 sm:p-2 md:p-3 bg-black bg-opacity-80 rounded-full hover:bg-opacity-70 transition">
-            <User size={16} className="text-white sm:hidden" />
+            <User size={20} className="text-white sm:hidden" />
             <User size={21} className="text-white hidden sm:block md:hidden" />
-            <User size={26} className="text-white hidden md:block" />
+            <User size={28} className="text-white hidden md:block" />
         </button>
     </div>
         </header>
@@ -142,7 +142,7 @@ const CareerRoadmap = ({ sessionData, onStartNewSession }) => {
         <div className="max-w-7xl mx-auto">
             {/* The title and subtitle text should be white to be visible */}
             <h1 className="text-3xl font-extrabold text-white mb-1 text-center">Your Personalized Career Roadmap</h1>
-            <p className="text-base text-white/80 mb-6 text-center">Here are a few potential paths based on our conversation.</p>
+            <p className="text-lg text-white/90 font-glory mb-6 text-center">Here are a few potential paths based on our conversation.</p>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {roadmapData && roadmapData.map((option, index) => (
@@ -153,7 +153,7 @@ const CareerRoadmap = ({ sessionData, onStartNewSession }) => {
             <div className="text-center mt-8">
                 <button 
                 onClick={onStartNewSession} 
-                className="bg-white opacity-80 text-black font-semibold text-lg py-3 px-8 rounded-xl font-glory hover:bg-gray-200 transition-all duration-200 shadow-lg"
+                className="bg-white/80 text-black font-semibold text-lg py-3 px-8 rounded-full font-glory hover:bg-gray-200 transition-all duration-200 shadow-lg"
                 >
                 Start a New Session
                 </button>

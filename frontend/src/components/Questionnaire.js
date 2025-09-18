@@ -89,7 +89,7 @@ return (
 </div>
       
         {/* Glassmorphism Card */}
-<div className="bg-green-200/20 backdrop-blur-lg border border-white rounded-xl sm:rounded-2xl shadow-xl p-3 sm:p-4 md:p-6 w-full max-w-xs sm:max-w-sm md:max-w-md flex flex-col">
+<div className="bg-white bg-opacity-5 backdrop-blur-md border border-white/50 rounded-xl sm:rounded-2xl shadow-xl p-3 sm:p-4 md:p-6 w-full max-w-xs sm:max-w-sm md:max-w-md flex flex-col">
     
     <h2 className="text-base sm:text-lg md:text-xl font-light text-center mb-4 sm:mb-6 mt-3 sm:mt-4 md:mt-6 px-2">
     {currentQuestion.question}

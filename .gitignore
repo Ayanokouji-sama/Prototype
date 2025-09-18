@@ -1,0 +1,29 @@
+# --- Python / Django ---
+__pycache__/
+*.pyc
+venv/
+db.sqlite3
+
+# --- Environment Variables ---
+# Never commit your secret keys!
+.env
+*.env
+
+# --- Node.js / React ---
+# The node_modules folder can be thousands of files and should never be committed.
+# It can be re-created by running `npm install`.
+node_modules/
+build/
+.npm/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# --- User-Uploaded Media ---
+# Ignore the media folder where user resumes are stored.
+media/
+
+# --- IDE / OS Files ---
+.vscode/
+.idea/
+.DS_Store
