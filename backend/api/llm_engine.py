@@ -1,5 +1,6 @@
 # backend/api/llm_engine.py
 import json
+import re
 
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
@@ -8,6 +9,7 @@ from langchain_community.embeddings import OllamaEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 from langchain_ollama import OllamaLLM
+from .youtube import get_youtube_courses
 
 # --- Initialization ---
 llm = OllamaLLM(model="llama3.1", temperature=0.7)
@@ -46,7 +48,7 @@ You are an expert career counselor AI. Your goal is to have a natural, multi-ste
 1.  **Phase 1: Rapport Building (First 2 AI messages).** Your first message is a warm welcome. Your second message should be an open-ended question to make the user comfortable.
 2.  **Phase 2: Conditional Logic (AI's 3rd message).**
     - IF the user's status is 'school_student', continue the conversation naturally.
-    - IF the user's status is 'college_student' or 'passout', politely ask them to paste their resume.
+    - IF the user's status is 'college_student' or 'passout', politely ask them to attach their resume.
 3.  **Phase 3: Counseling.**
     - For school students, analyze their concerns and provide guidance.
     - For college/passout, once they provide a resume, analyze it and begin counseling.
@@ -104,9 +106,11 @@ def chat_with_ai(context: dict, message: str, history: str):
 # --- UPDATED: Career-roadmap AI Function ---
 
 
+# In llm_engine.py
+
 def generate_career_roadmap(session, history_text):
     """
-    Generates a career roadmap with a more robust and specific prompt.
+    Final version: Uses the Coursera API to find real, verified course links.
     """
     resume_context = "No resume provided for this session."
     if session.resume_file and hasattr(session.resume_file, 'path'):
@@ -117,6 +121,7 @@ def generate_career_roadmap(session, history_text):
 
     # --- Conditional Prompting ---
     if session.status == 'school_student':
+        # The school student logic is unchanged.
         template = """
         You are a JSON generation assistant. Analyze the following conversation and generate a JSON object.
         Conversation:
@@ -132,33 +137,63 @@ def generate_career_roadmap(session, history_text):
         prompt = PromptTemplate(input_variables=["chat_history"], template=template)
         chain = LLMChain(llm=llm, prompt=prompt)
         result = chain.invoke({"chat_history": history_text})
+        # The data is returned directly after the try/except block.
 
     else: # For college students and professionals
+        # --- NEW PROMPT: ASKS FOR SEARCHABLE SKILLS ---
         template = """
-        Analyze the following conversation and resume context.
-        Chat History: {chat_history}
-        Resume Context: {resume_context}
-
-        Based on this information, your task is to suggest 3 detailed career pathways.
+        Analyze the conversation and resume context.
+        Suggest 3 detailed career pathways.
         You MUST format your response as a single, valid JSON object.
         The object must have one key "roadmap", a list of 3 pathway objects.
-        Each pathway object must have these exact keys: "title", "skills", "courses", "salary", "growth", "reasoning".
-        - The "courses" value MUST be a list of 2-3 strings.
-        - Each string in the "courses" list MUST be a full, valid Coursera URL starting with "https://www.coursera.org/".
-        Example for a course: "https://www.coursera.org/learn/python-for-everybody"
-
-        Do not add any other text or explanations. Your response must be only the JSON object.
+        Each object must have these exact keys: "title", "skills", "courses_to_find", "salary", "growth", "reasoning".
+        - The "courses_to_find" value MUST be a list of 2-3 strings.
+        - Each string MUST be a specific, searchable skill or course name (e.g., "Python for Everybody", "Machine Learning Specialization").
         """
         prompt = PromptTemplate(input_variables=["chat_history", "resume_context"], template=template)
         chain = LLMChain(llm=llm, prompt=prompt)
         result = chain.invoke({"chat_history": history_text, "resume_context": resume_context})
 
     try:
+        llm_output_text = result['text']
         print("--- LLM Roadmap Response ---")
-        print(result['text'])
+        print(llm_output_text)
         print("--------------------------")
-        return json.loads(result['text'])
-    except (json.JSONDecodeError, TypeError, KeyError):
-        return {"error": "Failed to decode the roadmap from AI response."}
+
+        data = None
+        # First, try to find a JSON block inside ```json ... ```
+        json_match = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', llm_output_text, re.DOTALL)
+    
+        if json_match:
+            # If we find a block, extract and parse it
+            json_string = json_match.group(1)
+            data = json.loads(json_string)
+        elif llm_output_text.startswith('{') and llm_output_text.endswith('}'):
+            # If no block is found, check if the whole response IS the JSON
+            data = json.loads(llm_output_text)
+        else:
+            # If neither of the above are true, we can't process it.
+            raise ValueError("Could not find or parse a valid JSON object in the AI's response.")
+        
+        # --- NEW: API Integration Loop ---
+        # If it's a college student, find real courses
+        if session.status != 'school_student' and 'roadmap' in data:
+            for pathway in data['roadmap']:
+                verified_courses = []
+                if 'courses_to_find' in pathway:
+                    for skill_to_find in pathway['courses_to_find']:
+                        # Call our new API helper for each skill
+                        courses = get_youtube_courses(skill_to_find, max_results=1)
+                        if courses:
+                            verified_courses.append(courses[0])
+                            
+                    # Replace the AI's suggestions with our verified data
+                    pathway['courses'] = verified_courses
+                    del pathway['courses_to_find'] 
+        return data
+
+    except (json.JSONDecodeError, TypeError, KeyError) as e:
+        print(f"Error processing roadmap: {e}")
+        return {"error": "Failed to decode or process the roadmap from AI response."}
     
     

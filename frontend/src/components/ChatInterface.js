@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { getChatHistory, sendMessage, uploadResume } from '../services/api';
 import { Menu, User, Send, Mic, Paperclip } from 'lucide-react';
 import counselorAvatar from '../assets/avatar.png';
+import { ReactComponent as MyLogo } from '../assets/my-logo.svg';
 
 // This component uses YOUR original logic with the NEW design.
 const ChatInterface = ({ sessionData, onNavigateToRoadmap }) => {
@@ -150,83 +151,83 @@ const ChatInterface = ({ sessionData, onNavigateToRoadmap }) => {
   // --- NEW JSX FOR THE VISUAL DESIGN ---
   
   return (
-    <div className="h-screen w-screen bg-cover bg-center text-white font-glory brightness-125 overflow-hidden" style={{ backgroundImage: `url('/background.png')` }}>
-  <div className="h-full w-full bg-black bg-opacity-15 backdrop-blur-light flex flex-col p-4 sm:p-6 md:p-8 lg:p-12 overflow-hidden">
-        
-        {/* Header */}
-<header className="flex items-center justify-between flex-shrink-0 px-4 sm:px-6 md:px-8">
-  <div className="flex items-center gap-0">
-    <button className="p-2 sm:p-3 bg-black bg-opacity-100 rounded-full hover:bg-opacity-70 transition z-10">
-      <Menu size={24} className="text-white sm:hidden" />
-      <Menu size={32} className="text-white hidden sm:block md:hidden" />
-      <Menu size={40} className="text-white hidden md:block" />
-    </button>
-    <div className="px-4 sm:px-8 md:px-12 lg:px-16 xl:px-24 py-2 sm:py-3 md:py-4 bg-white bg-opacity-10 rounded-full -ml-8 sm:-ml-12 md:-ml-16">
-      <span className="font-light text-sm sm:text-lg md:text-xl lg:text-2xl xl:text-3xl text-black ml-2 sm:ml-3 md:ml-4 whitespace-nowrap">
-        Career Session
-      </span>
-    </div>
-  </div>
-  <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#64855f]/75">*</div>
-  <button className="p-2 sm:p-3 md:p-4 bg-black bg-opacity-100 rounded-full hover:bg-opacity-70 transition">
-    <User size={20} className="sm:hidden" />
-    <User size={28} className="hidden sm:block md:hidden" />
-    <User size={34} className="hidden md:block" />
-  </button>
-</header>
+    <div className="h-screen w-screen flex flex-col items-center justify-center p-3 sm:p-4 md:p-6 lg:p-8 text-white relative overflow-hidden">
+    <div className="h-full w-full bg-black bg-opacity-15 backdrop-blur-light flex flex-col p-3 sm:p-4 md:p-6 lg:p-8 overflow-hidden">
+      
+      {/* Header */}
+      <header className="flex items-center justify-between flex-shrink-0 px-3 sm:px-4 md:px-6">
+        <div className="flex items-center gap-0">
+          <button className="p-1.5 sm:p-2 bg-black bg-opacity-100 rounded-full hover:bg-opacity-70 transition z-10">
+            <Menu size={18} className="text-white sm:hidden" />
+            <Menu size={24} className="text-white hidden sm:block md:hidden" />
+            <Menu size={30} className="text-white hidden md:block" />
+          </button>
+          <div className="px-3 sm:px-6 md:px-9 lg:px-12 xl:px-18 py-1.5 sm:py-2 md:py-3 bg-white bg-opacity-10 rounded-full -ml-6 sm:-ml-9 md:-ml-12">
+            <span className="font-light text-xs sm:text-base md:text-lg lg:text-xl xl:text-2xl text-white ml-1.5 sm:ml-2 md:ml-3 whitespace-nowrap">
+              Career Session
+            </span>
+          </div>
+        </div>
+        <MyLogo className="w-5 h-5 sm:w-7 sm:h-7 md:w-9 md:w-9 text-white opacity-70" />
+        <button className="p-1.5 sm:p-2 md:p-3 bg-black bg-opacity-100 rounded-full hover:bg-opacity-70 transition">
+          <User size={16} className="sm:hidden" />
+          <User size={21} className="hidden sm:block md:hidden" />
+          <User size={26} className="hidden md:block" />
+        </button>
+      </header>
 
-        {/* Main Content */}
-<main className="flex-1 flex flex-col md:flex-row gap-4 sm:gap-6 md:gap-8 lg:gap-10 mt-4 sm:mt-6 md:mt-8 mb-2 overflow-hidden shadow-black">
-          
-          {/* Left Sidebar */}
-<aside className="w-full md:w-80 lg:w-[400px] flex flex-col ml-0 md:ml-3 lg:ml-5 h-auto md:h-full relative transition backdrop-blur-sm order-2 md:order-1">
-  <div 
-    className="h-auto md:h-full bg-white bg-opacity-10 backdrop-blur-md p-4 lg:p-6 flex flex-col rounded-3xl md:rounded-[48px]"
-    style={{
-      clipPath: 'polygon(0% 0%, 100% 0%, 100% 43%, 90% 46%, 90% 54%, 100% 57%, 100% 100%, 0% 100%, 0% 57%, 10% 54%, 10% 46%, 0% 43%)'
-    }}
-  >
-    {/* Top section */}
-    <div className="flex-1 mb-4">
-      {/* START: Counselor Avatar Section */}
-      <div className="flex flex-col items-center text-center">
-        <img 
-          src={counselorAvatar} 
-          alt="Counselor Mr. Lee"
-          className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 lg:w-58 lg:h-56 mt-4 sm:mt-6 md:mt-8 lg:mt-10 mb-4 sm:mb-6 md:mb-8 lg:mb-12 opacity-90 rounded-full"
-        />
-        <h3 className="mt-2 md:mt-4 text-xl sm:text-xl md:text-2xl font-glory font-light text-white">Marvin</h3>
-        <p className="text-base sm:text-lg text-white/80">Career Counselor</p>
-      </div>
-    </div>
-    
-    {/* Chat Log section */}
-    <div className="h-auto md:h-64">
-      <div className="outline-black mt-0 text-center py-2 sm:py-3 mb-3 sm:mb-4 bg-white bg-opacity-100 text-black rounded-full font-light text-base sm:text-lg md:text-xl">
-        Chat Log
-      </div>
-      {/* Chat history in a rounded container like Figma */}
-      <div className="bg-white bg-opacity-0 text-black backdrop-blur-sm rounded-2xl sm:rounded-3xl p-3 sm:p-4 max-h-32 sm:max-h-36 md:max-h-44 overflow-hidden outline-white">
-        <ul className="text-xs sm:text-sm space-y-1 sm:space-y-2 overflow-y-auto pr-1 sm:pr-2 custom-scrollbar">
-          {messages.map(msg => (
-            <li key={msg.message_id} className="truncate text-white opacity-90 font-light text-sm sm:text-base md:text-lg">
-              • {msg.message}
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
-  </div>
-</aside>
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col md:flex-row gap-3 sm:gap-4 md:gap-6 lg:gap-8 mt-3 sm:mt-4 md:mt-6 mb-2 overflow-hidden shadow-black">
+        
+        {/* Left Sidebar */}
+        <aside className="w-full md:w-64 lg:w-80 flex flex-col ml-0 md:ml-2 lg:ml-4 h-auto md:h-full relative transition backdrop-blur-sm order-2 md:order-1">
+          <div 
+            className="h-auto md:h-full bg-white bg-opacity-10 backdrop-blur-md p-3 lg:p-4 flex flex-col rounded-2xl md:rounded-[36px]"
+            style={{
+              clipPath: 'polygon(0% 0%, 100% 0%, 100% 43%, 90% 46%, 90% 54%, 100% 57%, 100% 100%, 0% 100%, 0% 57%, 10% 54%, 10% 46%, 0% 43%)'
+            }}
+          >
+            {/* Top section */}
+            <div className="flex-1 mb-3">
+              {/* START: Counselor Avatar Section */}
+              <div className="flex flex-col items-center text-center">
+                <img 
+                  src={counselorAvatar} 
+                  alt="Counselor Mr. Lee"
+                  className="w-24 h-24 sm:w-30 sm:h-30 md:w-36 md:h-36 lg:w-44 lg:h-42 mt-3 sm:mt-4 md:mt-6 lg:mt-8 mb-3 sm:mb-4 md:mb-6 lg:mb-9 opacity-90 rounded-full"
+                />
+                <h3 className="mt-1.5 md:mt-3 text-lg sm:text-lg md:text-xl font-glory font-light text-white">Marvin</h3>
+                <p className="text-sm sm:text-base text-white/80">Career Counselor</p>
+              </div>
+            </div>
+            
+            {/* Chat Log section */}
+            <div className="h-auto md:h-48">
+              <div className="outline-black mt-0 text-center py-1.5 sm:py-2 mb-2 sm:mb-3 bg-white bg-opacity-100 text-black rounded-full font-light text-sm sm:text-base md:text-lg">
+                Chat Log
+              </div>
+              {/* Chat history in a rounded container like Figma */}
+              <div className="bg-white bg-opacity-0 text-black backdrop-blur-sm rounded-xl sm:rounded-2xl p-2 sm:p-3 max-h-24 sm:max-h-27 md:max-h-33 overflow-hidden outline-white">
+                <ul className="text-xs sm:text-xs space-y-0.5 sm:space-y-1 overflow-y-auto pr-1 sm:pr-1.5 custom-scrollbar">
+                  {messages.map(msg => (
+                    <li key={msg.message_id} className="truncate text-white opacity-90 font-light text-xs sm:text-sm md:text-base">
+                      • {msg.message}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </aside>
 
           {/* Chat Area */}
-<section className="font-roboto-flex flex-1 flex flex-col bg-white bg-opacity-5 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-3 sm:p-4 md:p-6 mr-0 md:mr-3 lg:mr-5 shadow-2xl shadow-black/40 order-1 md:order-2 min-h-0 max-h-full">
+<section className="font-roboto-flex flex-1 flex flex-col bg-white bg-opacity-5 backdrop-blur-lg rounded-xl sm:rounded-2xl p-2 sm:p-3 md:p-4 mr-0 md:mr-2 lg:mr-4 shadow-2xl shadow-black/40 order-1 md:order-2 min-h-0 max-h-full">
 
   {/* Message list container - CRITICAL FIXES */}
-<div className="flex-1 overflow-y-auto space-y-3 sm:space-y-4 md:space-y-6 pr-1 sm:pr-2 custom-scrollbar min-h-0">
+<div className="flex-1 overflow-y-auto space-y-2 sm:space-y-3 md:space-y-4 pr-1 sm:pr-1.5 custom-scrollbar min-h-0">
   {isLoading ? (
-    <div className="flex justify-center items-center h-full min-h-[200px]">
-      <div className="animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 border-b-2 border-white"></div>
+    <div className="flex justify-center items-center h-full min-h-[150px]">
+      <div className="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 md:h-9 md:w-9 border-b-2 border-white"></div>
     </div>
   ) : (
     messages.map((msg) => <MessageBubble key={msg.message_id} message={msg} onNavigate={onNavigateToRoadmap} />)
@@ -236,10 +237,10 @@ const ChatInterface = ({ sessionData, onNavigateToRoadmap }) => {
 </div>
 
 {/* Input area - FIXED AT BOTTOM */}
-<div className="mt-3 sm:mt-4 md:mt-6 flex items-center gap-2 sm:gap-3 md:gap-4 flex-shrink-0">
+<div className="mt-2 sm:mt-3 md:mt-4 flex items-center gap-1.5 sm:gap-2 md:gap-3 flex-shrink-0">
   
   {/* Item 1: The Input Bar */}
-  <div className="input-glow-line flex-1 flex items-center gap-2 sm:gap-3 bg-white text-black text-base sm:text-lg backdrop-blur-lg rounded-full p-1 sm:p-2">
+  <div className="input-glow-line flex-1 flex items-center gap-1.5 sm:gap-2 bg-white text-black text-sm sm:text-base backdrop-blur-lg rounded-full p-0.5 sm:p-1.5">
     <input 
       ref={inputRef}
       type="text"
@@ -247,13 +248,13 @@ const ChatInterface = ({ sessionData, onNavigateToRoadmap }) => {
       onChange={(e) => setInputMessage(e.target.value)}
       onKeyPress={handleKeyPress}
       placeholder="Type Your Career Question..."
-      className="flex-1 bg-transparent px-3 sm:px-4 py-2 text-black placeholder-gray-600 focus:outline-none text-sm sm:text-base md:text-lg min-w-0"
+      className="flex-1 bg-transparent px-2 sm:px-3 py-1.5 text-black placeholder-gray-600 focus:outline-none text-xs sm:text-sm md:text-base min-w-0"
       disabled={isTyping || isLoading}
     />
     <button
       onClick={handleSendMessage}
       disabled={!inputMessage.trim() || isTyping || isLoading}
-      className="p-2 sm:p-3 bg-white text-black rounded-full hover:bg-gray-200 disabled:opacity-50 transition flex-shrink-0"
+      className="p-1.5 sm:p-2 bg-white text-black rounded-full hover:bg-gray-200 disabled:opacity-50 transition flex-shrink-0"
     >
       <Send size={16} className="sm:hidden" />
       <Send size={20} className="hidden sm:block" />
@@ -270,14 +271,14 @@ const ChatInterface = ({ sessionData, onNavigateToRoadmap }) => {
   />
   <button 
     onClick={handleFileSelect} 
-    className="p-2 sm:p-3 md:p-4 bg-black bg-opacity-100 rounded-full hover:bg-opacity-80 transition text-white flex-shrink-0">
+    className="p-1.5 sm:p-2 md:p-3 bg-black bg-opacity-100 rounded-full hover:bg-opacity-80 transition text-white flex-shrink-0">
     <Paperclip size={18} className="sm:hidden" />
     <Paperclip size={20} className="hidden sm:block md:hidden" />
     <Paperclip size={24} className="hidden md:block" />
   </button>
 
   {/* Item 2: The Standalone Mic Button */}
-  <button className="p-2 sm:p-3 md:p-4 bg-black bg-opacity-100 rounded-full hover:bg-opacity-80 transition text-white flex-shrink-0">
+  <button className="p-1.5 sm:p-2 md:p-3 bg-black bg-opacity-100 rounded-full hover:bg-opacity-80 transition text-white flex-shrink-0">
     <Mic size={18} className="sm:hidden" />
     <Mic size={20} className="hidden sm:block md:hidden" />
     <Mic size={24} className="hidden md:block" />
@@ -337,9 +338,9 @@ const ChatInterface = ({ sessionData, onNavigateToRoadmap }) => {
 const MessageBubble = ({ message, onNavigate }) => {
   const isUser = message.sender === 'user';
   
-  // Fixed classes - removed conflicts
+  // Fixed classes - text color only defined here, not in paragraph
   const userBubbleClass = 'bg-[#64855f]/75 text-white';
-  const aiBubbleClass = 'bg-white/10 text-black';
+  const aiBubbleClass = 'bg-white/10 text-white/80'; // Change this color as needed
 
   // --- Link Detection Logic ---
   const roadmapLinkText = '[View Your Roadmap]';
@@ -355,10 +356,10 @@ const MessageBubble = ({ message, onNavigate }) => {
         lg:max-w-[55%] 
         xl:max-w-[50%] 
         2xl:max-w-[45%]
-        p-3 
-        sm:p-4 
-        rounded-2xl 
-        sm:rounded-3xl 
+        p-2
+        sm:p-3 
+        rounded-xl 
+        sm:rounded-2xl 
         backdrop-blur-xl 
         shadow-lg 
         ${isUser ? userBubbleClass : aiBubbleClass}
@@ -366,19 +367,19 @@ const MessageBubble = ({ message, onNavigate }) => {
         {containsRoadmapLink ? (
           // If it's the special link, render a button
           <div>
-            <p className={`whitespace-pre-wrap leading-relaxed opacity-90 break-words text-sm sm:text-base mb-3 ${isUser ? 'text-white' : 'text-black'}`}>
+            <p className="whitespace-pre-wrap leading-relaxed opacity-90 break-words text-xs sm:text-sm mb-2">
               {message.message.split(roadmapLinkText)[0]} {/* Show text before the link */}
             </p>
             <button
               onClick={onNavigate}
-              className="w-full text-center font-bold text-white bg-green-500 rounded-lg px-4 py-2 hover:bg-green-600 transition-all duration-200"
+              className="w-full text-center font-light text-white bg-[#64855f]/75 rounded-lg px-3 py-1.5 hover:bg-[#64855f]/100 transition-all duration-200 text-xs sm:text-sm"
             >
               View Your Roadmap
             </button>
           </div>
         ) : (
-          // Otherwise, render the normal message text
-          <p className={`whitespace-pre-wrap leading-relaxed opacity-90 hyphens-none break-words text-sm sm:text-base ${isUser ? 'text-white' : 'text-black'}`}>
+          // Otherwise, render the normal message text - NO text color classes here
+          <p className="whitespace-pre-wrap leading-relaxed opacity-90 hyphens-none break-words text-xs sm:text-sm">
             {message.message}
           </p>
         )}

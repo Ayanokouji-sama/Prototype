@@ -3,6 +3,7 @@ import Questionnaire from './components/Questionnaire';
 import LoadingScreen from './components/LoadingScreen';
 import ChatInterface from './components/ChatInterface';
 import CareerRoadmap from './components/CareerRoadmap';
+import VideoBackground from './components/VideoBackground';
 import './index.css';
 
 function App() {
@@ -56,6 +57,7 @@ function App() {
 
   return (
     <div className="font-sans antialiased text-gray-800">
+      <VideoBackground /> {/* <-- 2. ADD IT HERE */}
       {renderCurrentStage()}
     </div>
   );
