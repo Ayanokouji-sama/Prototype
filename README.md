@@ -364,19 +364,3 @@ Add useful labels: `hackathon`, `feature`, `bug`, `docs`.
 * [ ] Add clear environment variable examples and a `.env.example` file
 
 ---
-
-## License & contact
-
-Add your preferred license file (e.g., `MIT`).
-
-Author: Repository owners — add an email or team contact here.
-
----
-
-If you want, I can:
-
-* generate a ready-to-commit `README.md` file with badges and a short demo GIF placeholder,
-* create `.env.example` and `setup.sh` / `Makefile` to automate the commands,
-* or produce a minimal `docker-compose.yml` with exact build steps for both services.
-
-Tell me which of those you want next and I'll add them directly into the repo files.
