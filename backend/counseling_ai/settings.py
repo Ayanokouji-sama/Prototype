@@ -52,7 +52,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'counseling_ai.urls'
+ROOT_URLCONF = 'backend.counseling_ai.urls'
 
 TEMPLATES = [
     {
