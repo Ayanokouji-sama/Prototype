@@ -1,0 +1,1 @@
+web: gunicorn counseling_ai.wsgi
