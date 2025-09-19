@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'corsheaders',
 
     # Your local app
-    'api.apps.ApiConfig', # Use the explicit app config path
+    'backend.api.apps.ApiConfig', # Use the explicit app config path
 ]
 
 MIDDLEWARE = [
