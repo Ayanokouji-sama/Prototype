@@ -75,9 +75,8 @@ const ChatInterface = ({ sessionData, onNavigateToRoadmap }) => {
         if (uploadResponse.success && uploadResponse.ai_response) {
           setMessages(prev => [...prev, userFileMessage, uploadResponse.ai_response]);
           // Speak the AI's response after the file is analyzed.
-          const utterance = new SpeechSynthesisUtterance(uploadResponse.ai_response.message);
-          speechSynthesis.speak(utterance);
-        } else {
+          
+        } else {                     
           // This handles cases where the upload works but the AI fails to respond.
           throw new Error("File upload succeeded, but no AI response was received.");
         }
@@ -113,8 +112,7 @@ const ChatInterface = ({ sessionData, onNavigateToRoadmap }) => {
         const response = await sendMessage(currentInput, sessionId);
         if (response.success && response.ai_response) {
           setMessages(prev => [...prev, response.ai_response]);
-          const utterance = new SpeechSynthesisUtterance(response.ai_response.message);
-          speechSynthesis.speak(utterance);
+          
         } else {
           throw new Error("Invalid AI response from backend.");
         }

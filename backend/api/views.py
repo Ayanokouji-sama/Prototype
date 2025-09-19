@@ -48,7 +48,7 @@ def send_message(request):
          # --- ROADMAP TRIGGER LOGIC ---
          # First, get the total message count for this session
         message_count = ChatMessage.objects.filter(session=session).count()
-        limit_reached = message_count >= 12
+        limit_reached = message_count >= 20
         # Check if the message limit is reached AND the roadmap hasn't been created yet
         if (limit_reached or user_wants_roadmap) and not session.roadmap_data:
             
@@ -60,7 +60,7 @@ def send_message(request):
             session.roadmap_data = roadmap_json
             session.save()
             
-            final_ai_message_text = f"We've had a great conversation! I've prepared a personalized career roadmap for you based on everything we've discussed. You can access it here: [View Your Roadmap](/roadmap/{session.session_id})"
+            final_ai_message_text = f"Oops! You've reached the message limit for this session. We've had a great conversation! I've prepared a personalized career roadmap for you based on everything we've discussed. You can access it here: [View Your Roadmap](/roadmap/{session.session_id})"
             
             ai_message = ChatMessage.objects.create(session=session, sender='ai', message=final_ai_message_text)
         else:

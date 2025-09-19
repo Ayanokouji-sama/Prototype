@@ -7,15 +7,8 @@ import VideoBackground from './components/VideoBackground';
 import './index.css';
 
 function App() {
-  const [currentStage, setCurrentStage] = useState(() => localStorage.getItem('currentStage') || 'questionnaire');
-  const [sessionData, setSessionData] = useState(() => JSON.parse(localStorage.getItem('sessionData')) || null);
-
-  useEffect(() => {
-    localStorage.setItem('currentStage', currentStage);
-    localStorage.setItem('sessionData', JSON.stringify(sessionData));
-  }, [currentStage, sessionData]);
-
-
+  const [currentStage, setCurrentStage] = useState('questionnaire');
+  const [sessionData, setSessionData] = useState(null);
 
   const handleQuestionnaireComplete = (data) => {
     console.log('Questionnaire successful. Session data:', data);
@@ -34,8 +27,6 @@ function App() {
   };
 
   const handleStartNewSession = () => {
-    localStorage.removeItem('currentStage');
-    localStorage.removeItem('sessionData');
     setCurrentStage('questionnaire');
     setSessionData(null);
   };

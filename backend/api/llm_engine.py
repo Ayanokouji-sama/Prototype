@@ -123,8 +123,8 @@ def generate_career_roadmap(session, history_text):
     if session.status == 'school_student':
         # The school student logic is unchanged.
         template = """
-        You are a JSON generation assistant. Analyze the following conversation and generate a JSON object.
-        Conversation:
+        You are a career counselor AI. Your SOLE task is to generate a JSON response based ONLY on the provided Chat History.
+        DO NOT invent or suggest generic careers. The suggestions MUST be directly related to the user's stated interests in the provided context:
         ---
         {chat_history}
         ---
@@ -142,8 +142,14 @@ def generate_career_roadmap(session, history_text):
     else: # For college students and professionals
         # --- NEW PROMPT: ASKS FOR SEARCHABLE SKILLS ---
         template = """
-        Analyze the conversation and resume context.
-        Suggest 3 detailed career pathways.
+        You are a career counselor AI. Your SOLE task is to generate a JSON response based ONLY on the provided Chat History and Resume Context.
+        DO NOT invent or suggest generic careers. The suggestions MUST be directly related to the user's stated interests in the provided context:
+
+        Analyze the following conversation and resume context.
+        Chat History: {chat_history}
+        Resume Context: {resume_context}
+
+        TASK: Based on this information, Suggest 3 detailed career pathways.
         You MUST format your response as a single, valid JSON object.
         The object must have one key "roadmap", a list of 3 pathway objects.
         Each object must have these exact keys: "title", "skills", "courses_to_find", "salary", "growth", "reasoning".
