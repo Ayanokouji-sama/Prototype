@@ -1,6 +1,7 @@
-# backend/api/llm_engine.py
 import json
 import re
+from django.conf import settings
+from groq import Groq  
 
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
@@ -12,6 +13,7 @@ from langchain_ollama import OllamaLLM
 from .youtube import get_youtube_courses
 
 # --- Initialization ---
+client = Groq(api_key=settings.GROQ_API_KEY)
 llm = OllamaLLM(model="llama3.1", temperature=0.7)
 embeddings = OllamaEmbeddings(model="llama3.1")
 
@@ -80,37 +82,63 @@ chain = LLMChain(llm=llm, prompt=prompt)
 # --- Main AI Function ---
 def chat_with_ai(context: dict, message: str, history: str):
     """
-    Generates an AI response, now with the ability to process a resume.
+    Generates an AI response using the Groq API.
     """
     resume_context = "No resume has been provided for this session yet."
     
-    # Check if a resume path is available in the session context
     if context.get("resume_path"):
         vector_store = process_resume(context["resume_path"])
         if vector_store:
-            # Find the most relevant parts of the resume based on the user's message
             relevant_chunks = vector_store.similarity_search(message, k=2)
             resume_context = " ".join([chunk.page_content for chunk in relevant_chunks])
             print("Found relevant resume context.")
 
-    # Call the LLM with all available information
-    result = chain.invoke({
-        "name": context.get("name", "the user"),
-        "status": context.get("status", "N/A"),
-        "age": context.get("age", "N/A"),
-        "resume_context": resume_context,
-        "history": history,
-        "message": message,
-    })
-    return result['text']
-# --- UPDATED: Career-roadmap AI Function ---
+    # Construct a new prompt for the Groq API
+    prompt = f"""
+    You are an expert career counselor AI named Marvin. Your goal is to have a natural, multi-step conversation.
 
+    **Conversation Rules:**
+    1.  **Phase 1: Rapport Building (First 2 AI messages).** Your first message is a warm welcome. Your second message should be an open-ended question to make the user comfortable.
+    2.  **Phase 2: Conditional Logic (AI's 3rd message).**
+        - IF the user's status is 'school_student', continue the conversation naturally.
+        - IF the user's status is 'college_student' or 'passout', politely ask them to attach their resume.
+    3.  **Phase 3: Counseling.**
+        - For school students, analyze their concerns and provide guidance.
+        - For college/passout, once they provide a resume, analyze it and begin counseling.
 
-# In llm_engine.py
+    **User's Background Information:**
+    - Name: {context.get("name", "the user")}
+    - Status: {context.get("status", "N/A")}
+    - Age: {context.get("age", "N/A")}
+    - **Resume Context:** {resume_context}
+
+    **Conversation History:**
+    {history}
+
+    The user just sent this message: "{message}"
+
+    ---
+    **IMPORTANT INSTRUCTION:** Your final output must ONLY be the words the counselor would say. Do not add any notes, explanations, or mention your internal rules or phases.
+
+    Your next response as the AI Counselor:
+    """
+    
+    # Groq API call
+    chat_completion = client.chat.completions.create(
+        messages=[
+            {"role": "user", "content": prompt}
+        ],
+        model="llama-3.1-8b-instant",  # You can also use "mixtral-8x7b-32768" or "llama3-70b-8192"
+        max_tokens=1000,
+        temperature=0.7
+    )
+    
+    return chat_completion.choices[0].message.content
+
 
 def generate_career_roadmap(session, history_text):
     """
-    Final version: Uses the Coursera API to find real, verified course links.
+    Generates a career roadmap using the Groq API.
     """
     resume_context = "No resume provided for this session."
     if session.resume_file and hasattr(session.resume_file, 'path'):
@@ -119,14 +147,12 @@ def generate_career_roadmap(session, history_text):
             relevant_chunks = vector_store.similarity_search(history_text, k=3)
             resume_context = " ".join([chunk.page_content for chunk in relevant_chunks])
 
-    # --- Conditional Prompting ---
     if session.status == 'school_student':
-        # The school student logic is unchanged.
-        template = """
-        You are a career counselor AI. Your SOLE task is to generate a JSON response based ONLY on the provided Chat History.
-        DO NOT invent or suggest generic careers. The suggestions MUST be directly related to the user's stated interests in the provided context:
+        prompt = f"""
+        You are a JSON generation assistant. Analyze the following conversation and generate a JSON object.
+        Conversation:
         ---
-        {chat_history}
+        {history_text}
         ---
         TASK: Based on the conversation, suggest 3 academic fields for the student.
         You MUST respond with ONLY a single, valid JSON object.
@@ -134,71 +160,62 @@ def generate_career_roadmap(session, history_text):
         Each object MUST have these exact keys: "title" (string), "skills" (list of strings), "reasoning" (string).
         DO NOT add any text before or after the JSON object.
         """
-        prompt = PromptTemplate(input_variables=["chat_history"], template=template)
-        chain = LLMChain(llm=llm, prompt=prompt)
-        result = chain.invoke({"chat_history": history_text})
-        # The data is returned directly after the try/except block.
-
     else: # For college students and professionals
-        # --- NEW PROMPT: ASKS FOR SEARCHABLE SKILLS ---
-        template = """
-        You are a career counselor AI. Your SOLE task is to generate a JSON response based ONLY on the provided Chat History and Resume Context.
-        DO NOT invent or suggest generic careers. The suggestions MUST be directly related to the user's stated interests in the provided context:
-
-        Analyze the following conversation and resume context.
-        Chat History: {chat_history}
+        prompt = f"""
+        Analyze the conversation and resume context.
+        Chat History: {history_text}
         Resume Context: {resume_context}
 
-        TASK: Based on this information, Suggest 3 detailed career pathways.
+        TASK: Based on this information, suggest 3 detailed career pathways.
         You MUST format your response as a single, valid JSON object.
         The object must have one key "roadmap", a list of 3 pathway objects.
         Each object must have these exact keys: "title", "skills", "courses_to_find", "salary", "growth", "reasoning".
         - The "courses_to_find" value MUST be a list of 2-3 strings.
-        - Each string MUST be a specific, searchable skill or course name (e.g., "Python for Everybody", "Machine Learning Specialization").
+        - Each string MUST be a specific, searchable skill or course name (e.g., "User Interface Design", "UX Research Methods").
         """
-        prompt = PromptTemplate(input_variables=["chat_history", "resume_context"], template=template)
-        chain = LLMChain(llm=llm, prompt=prompt)
-        result = chain.invoke({"chat_history": history_text, "resume_context": resume_context})
-
+    
+    # Groq API call
+    chat_completion = client.chat.completions.create(
+        messages=[
+            {"role": "user", "content": prompt}
+        ],
+        model="llama-3.1-8b-instant",  # You can also use "mixtral-8x7b-32768" or "llama3-70b-8192"
+        max_tokens=1500,
+        temperature=0.3
+    )
+    
     try:
-        llm_output_text = result['text']
+        llm_output_text = chat_completion.choices[0].message.content.strip()
         print("--- LLM Roadmap Response ---")
         print(llm_output_text)
         print("--------------------------")
 
+        # The rest of your existing logic for parsing the JSON and calling the YouTube API is unchanged.
         data = None
-        # First, try to find a JSON block inside ```json ... ```
         json_match = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', llm_output_text, re.DOTALL)
     
         if json_match:
-            # If we find a block, extract and parse it
             json_string = json_match.group(1)
             data = json.loads(json_string)
         elif llm_output_text.startswith('{') and llm_output_text.endswith('}'):
-            # If no block is found, check if the whole response IS the JSON
             data = json.loads(llm_output_text)
         else:
-            # If neither of the above are true, we can't process it.
             raise ValueError("Could not find or parse a valid JSON object in the AI's response.")
         
-        # --- NEW: API Integration Loop ---
-        # If it's a college student, find real courses
         if session.status != 'school_student' and 'roadmap' in data:
             for pathway in data['roadmap']:
                 verified_courses = []
                 if 'courses_to_find' in pathway:
                     for skill_to_find in pathway['courses_to_find']:
-                        # Call our new API helper for each skill
                         courses = get_youtube_courses(skill_to_find, max_results=1)
                         if courses:
                             verified_courses.append(courses[0])
-                            
-                    # Replace the AI's suggestions with our verified data
-                    pathway['courses'] = verified_courses
-                    del pathway['courses_to_find'] 
+                pathway['courses'] = verified_courses
+                del pathway['courses_to_find']
+        
         return data
 
-    except (json.JSONDecodeError, TypeError, KeyError) as e:
+    except (json.JSONDecodeError, TypeError, KeyError, ValueError) as e:
         print(f"Error processing roadmap: {e}")
         return {"error": "Failed to decode or process the roadmap from AI response."}
     
