@@ -354,13 +354,3 @@ python manage.py test
 Add useful labels: `hackathon`, `feature`, `bug`, `docs`.
 
 ---
-
-## Checklist for a demo-ready hackathon submission
-
-* [ ] Add screenshots/GIFs showing the flow
-* [ ] Add a short demo video (30–60s)
-* [ ] Provide simple seed data or a demo user flow
-* [ ] Create an easy `setup.sh` or Makefile to automate setup steps
-* [ ] Add clear environment variable examples and a `.env.example` file
-
----
