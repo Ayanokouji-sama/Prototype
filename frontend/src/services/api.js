@@ -1,5 +1,5 @@
 // Use relative URL since we have proxy configured in package.json
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+const API_BASE_URL = 'https://vision-track-prototype.onrender.com';
 
 async function makeRequest(endpoint, options = {}) {
   try {
