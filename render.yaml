@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: vision-track-backend
+    env: python
+    region: singapore
+    plan: free
+    buildCommand: "./backend/build.sh"
+    startCommand: "gunicorn backend.counseling_ai.wsgi --bind 0.0.0.0:$PORT"
+    envVars:
+      - key: DATABASE_URL
+        generateValue: true
+      - key: SECRET_KEY
+        generateValue: true
+      - fromGroup: vision-track-secrets
