@@ -136,6 +136,11 @@ CORS_ALLOWED_ORIGINS = [
     "https://vision-track-frontend.vercel.app",
     "http://127.0.0.1:3000",
 ]
+
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://vision-track-frontend-.*\.vercel\.app$",
+]
+
 CORS_ALLOW_CREDENTIALS = True
 
 YOUTUBE_API_KEY = env('YOUTUBE_API_KEY')
