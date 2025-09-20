@@ -11,7 +11,7 @@ const VideoBackground = () => {
         playsInline // Important for playback on iOS devices
         className="w-full h-full object-cover"
       >
-        <source src="/background-video.mp4" type="video/mp4" />
+        <source src="https://res.cloudinary.com/dhvdhycva/video/upload/v1758360179/background-video_yeip1g.mp4" type="video/mp4" />
         Your browser does not support the video tag.
       </video>
       
