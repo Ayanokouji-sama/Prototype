@@ -17,7 +17,7 @@ SECRET_KEY = env('SECRET_KEY')
 # Replace with a real secret key if deploying
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool('DEBUG', default=False)
 
 ALLOWED_HOSTS = ['vision-track-prototype.onrender.com','127.0.0.1', 'localhost']
 
@@ -70,7 +70,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'counseling_ai.wsgi.application'
+WSGI_APPLICATION = 'backend.counseling_ai.wsgi.application'
 
 
 # Database
