@@ -160,4 +160,4 @@ def upload_resume(request):
     }, status=status.HTTP_200_OK)
 
 def test_view(request):
-    return JsonResponse({"message": "Deployment test was successful!"})
+     return JsonResponse({"message": "This is the NEWEST version running."})
