@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from .models import UserSession, ChatMessage
 from .serializers import UserSessionSerializer, ChatMessageSerializer, ChatSendSerializer, ChatHistorySerializer
 from .llm_engine import chat_with_ai, generate_career_roadmap
-
+from django.http import JsonResponse
 
 @api_view(['POST'])
 def submit_questionnaire(request):
@@ -158,3 +158,6 @@ def upload_resume(request):
         'message': 'Resume uploaded successfully.',
         'ai_response': ChatMessageSerializer(ai_message).data
     }, status=status.HTTP_200_OK)
+
+def test_view(request):
+    return JsonResponse({"message": "Deployment test was successful!"})
