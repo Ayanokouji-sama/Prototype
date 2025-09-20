@@ -5,11 +5,6 @@ from groq import Groq
 
 # LangChain components for document processing
 from langchain_community.document_loaders import PyPDFLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.vectorstores import FAISS
-
-# Using Cohere for free, high-quality, cloud-based embeddings
-from langchain_cohere import CohereEmbeddings
 
 # Local module import
 from .youtube import get_youtube_courses
@@ -21,33 +16,56 @@ client = Groq(api_key=settings.GROQ_API_KEY)
 
 # Embeddings model provided by Cohere.
 # This is a free, API-based service. Make sure you have set your COHERE_API_KEY.
-embeddings = CohereEmbeddings(model="embed-english-v3.0")
+
 
 
 # --- Resume Processing Function ---
 def process_resume(file_path: str):
     """
-    Reads a resume file (PDF), splits it into chunks, and creates a searchable
-    vector store (a smart index) of its content using Cohere's embedding API.
+    Reads a resume file (PDF) and returns the text content.
+    No embeddings needed - Groq will analyze the full text.
     """
     if not file_path:
         return None
     try:
         loader = PyPDFLoader(file_path)
         pages = loader.load()
-        text = " ".join([page.page_content for page in pages])
-
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-        chunks = text_splitter.split_text(text)
-
-        # Create the smart index from the resume chunks using Cohere embeddings
-        vector_store = FAISS.from_texts(chunks, embedding=embeddings)
+        resume_text = " ".join([page.page_content for page in pages])
         print(f"Successfully processed resume: {file_path}")
-        return vector_store
+        return resume_text  # Return raw text instead of vector store
     except Exception as e:
         print(f"Error processing resume file: {e}")
         return None
 
+def get_relevant_resume_context(resume_text: str, user_query: str):
+    """
+    Use Groq to extract relevant resume information based on user query
+    """
+    if not resume_text:
+        return "No resume provided for this session."
+    
+    try:
+        response = client.chat.completions.create(
+            messages=[{
+                "role": "user", 
+                "content": f"""Analyze this resume and extract information relevant to the user's question.
+
+Resume Content:
+{resume_text[:4000]}  # Limit to avoid token limits
+
+User Question/Context: {user_query}
+
+Extract and summarize only the most relevant parts of the resume that relate to the user's question. Keep it concise but informative."""
+            }],
+            model="llama-3.1-8b-instant",
+            max_tokens=800,
+            temperature=0.3
+        )
+        
+        return response.choices[0].message.content
+    except Exception as e:
+        print(f"Error getting resume context: {e}")
+        return "Could not analyze resume content."
 
 # --- Main AI Function (Uses Groq) ---
 def chat_with_ai(context: dict, message: str, history: str):
